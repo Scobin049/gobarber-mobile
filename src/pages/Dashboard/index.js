@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import PropTypes from 'prop-types';
 
 import api from '~/services/api';
 
@@ -19,6 +20,21 @@ export default function Dashboard() {
     loadAppointments();
   }, []);
 
+  async function handleCancel(id) {
+    const response = await api.delete(`appointments/${id}`);
+
+    setAppointments(
+      appointments.map(appointment =>
+        appointment.id === id
+          ? {
+              ...appointment,
+              canceled_at: response.data.canceled_at,
+            }
+          : appointment
+      )
+    );
+  }
+
   return (
     <Background>
       <Container>
@@ -27,16 +43,24 @@ export default function Dashboard() {
         <List
           data={appointments}
           keyExtractor={item => String(item.id)}
-          renderItem={({ item }) => <Appointment data={item} />}
+          renderItem={({ item }) => (
+            <Appointment onCancel={() => handleCancel(item.id)} data={item} />
+          )}
         />
       </Container>
     </Background>
   );
 }
 
+function IconTab({ tintColor }) {
+  return <Icon name="event" size={20} color={tintColor} />;
+}
+
+IconTab.propTypes = {
+  tintColor: PropTypes.string.isRequired,
+};
+
 Dashboard.navigationOptions = {
   tabBarLabel: 'Agendamentos',
-  tabBarIcon: ({ tintColor }) => (
-    <Icon name="event" size={20} color={tintColor} />
-  ),
+  tabBarIcon: IconTab,
 };
