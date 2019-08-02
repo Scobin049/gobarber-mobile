@@ -15,8 +15,9 @@ export default function DateInput({ date, onChange }) {
 
   async function handleOpenPicker() {
     const { action, year, month, day } = await DatePickerAndroid.open({
-      mode: 'spinner',
-      date,
+      mode: 'calendar',
+      minDate: new Date(),
+      date: new Date(date),
     });
 
     if (action === DatePickerAndroid.dateSetAction) {
@@ -38,5 +39,5 @@ export default function DateInput({ date, onChange }) {
 
 DateInput.propTypes = {
   onChange: PropTypes.func.isRequired,
-  date: PropTypes.string.isRequired,
+  date: PropTypes.instanceOf(Date).isRequired,
 };
